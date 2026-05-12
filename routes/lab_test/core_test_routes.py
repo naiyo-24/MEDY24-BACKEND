@@ -10,7 +10,7 @@ import os
 
 router = APIRouter(prefix="/core-tests", tags=["Core Lab Tests"])
 
-@router.post("/")
+@router.post("/create")
 async def create_core_test(
     test_name: str = Form(...),
     test_category: str = Form(...),
@@ -49,7 +49,7 @@ async def create_core_test(
     db.refresh(new_test)
     return new_test
 
-@router.get("/")
+@router.get("/get-all")
 async def get_all_tests(
     page: int = Query(1, ge=1),
     limit: int = Query(20, le=20),
@@ -65,14 +65,14 @@ async def get_all_tests(
         "data": tests
     }
 
-@router.get("/{test_id}")
+@router.get("/get-by/{test_id}")
 async def get_test_by_id(test_id: str, db: Session = Depends(get_db)):
     test = db.query(CoreLabTest).filter(CoreLabTest.core_test_id == test_id).first()
     if not test:
         raise HTTPException(status_code=404, detail="Test not found")
     return test
 
-@router.put("/{test_id}")
+@router.put("/update-by/{test_id}")
 async def update_test_by_id(
     test_id: str,
     test_name: Optional[str] = Form(None),
@@ -106,7 +106,7 @@ async def update_test_by_id(
     db.refresh(test)
     return test
 
-@router.delete("/")
+@router.delete("/delete-by-ids")
 async def delete_tests_by_ids(test_ids: List[str] = Body(...), db: Session = Depends(get_db)):
     tests = db.query(CoreLabTest).filter(CoreLabTest.core_test_id.in_(test_ids)).all()
     if not tests:
