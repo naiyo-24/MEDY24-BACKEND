@@ -6,3 +6,5 @@ python-dotenv
 python-multipart
 pillow
 pydantic[email]
+firebase-admin
+PyJWT

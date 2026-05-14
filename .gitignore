@@ -8,9 +8,15 @@ env/
 
 # Environment variables
 .env
+.env.local
+
+# Firebase credentials (NEVER commit this!)
+secrets/
+secrets/*.json
 
 # Uploads
 uploads/
+.DS_Store
 
 # IDEs
 .vscode/

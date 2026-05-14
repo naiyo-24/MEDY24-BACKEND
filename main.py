@@ -11,16 +11,43 @@ from routes.medicine.core_medicine_routes import router as medicine_router
 from routes.medicine.medicine_inventory_routes import router as medicine_inventory_router
 from routes.terms_conditions.terms_conditions_routes import router as terms_conditions_router
 from routes.privacy_policy.privacy_policy_routes import router as privacy_policy_router
+from routes.auth.customer_user_routes import router as customer_router
 from db import init_db
 import uvicorn
 import os
-
 from contextlib import asynccontextmanager
+
+try:
+    import firebase_admin
+    from firebase_admin import credentials
+except ImportError:
+    firebase_admin = None
+    credentials = None
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup logic
     init_db()
+    
+    # Initialize Firebase Admin SDK
+    if firebase_admin and credentials:
+        firebase_creds_path = os.getenv("FIREBASE_CREDENTIALS_PATH")
+        if firebase_creds_path and os.path.exists(firebase_creds_path):
+            try:
+                cred = credentials.Certificate(firebase_creds_path)
+                try:
+                    firebase_admin.get_app()
+                except ValueError:
+                    # App doesn't exist yet, initialize it
+                    firebase_admin.initialize_app(cred)
+                print("✅ Firebase initialized successfully")
+            except Exception as e:
+                print(f"⚠️ Firebase initialization warning: {e}")
+        else:
+            print("⚠️ Firebase credentials path not found. Phone auth will be unavailable.")
+    else:
+        print("⚠️ Firebase Admin SDK not installed.")
+    
     print("🚀 Medy24 Backend is starting up...")
     print("🔗 Documentation available at http://localhost:8000/docs")
     yield
@@ -62,6 +89,7 @@ async def root():
 # Register routers
 app.include_router(patho_lab_router)
 app.include_router(pharma_shop_router)
+app.include_router(customer_router)
 app.include_router(core_test_router)
 app.include_router(lab_test_inventory_router)
 app.include_router(test_package_router)
