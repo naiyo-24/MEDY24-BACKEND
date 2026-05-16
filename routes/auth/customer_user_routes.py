@@ -34,6 +34,14 @@ class AddressInput(BaseModel):
     street_address: str = Field(..., description="Street address")
 
 
+class PaginatedCustomerResponse(BaseModel):
+    total: int = Field(..., description="Total number of customers")
+    page: int = Field(..., description="Current page number")
+    limit: int = Field(..., description="Items per page")
+    total_pages: int = Field(..., description="Total number of pages")
+    data: List[dict] = Field(..., description="List of customers")
+
+
 def normalize_customer_status(status: Optional[str]) -> str:
     normalized_status = (status or "active").strip().lower()
 
@@ -71,6 +79,49 @@ class VerifyOTPRequest(BaseModel):
     status: Optional[str] = Field("active", description="Customer status: active or suspended")
 
 router = APIRouter(prefix="/customers", tags=["Customer Auth"])
+
+
+@router.get("/get-all")
+async def get_all_customers(
+    page: int = 1,
+    limit: int = 10,
+    db: Session = Depends(get_db)
+):
+    """
+    Get all customers with pagination
+    
+    Query Parameters:
+    - page: Page number (default: 1)
+    - limit: Number of items per page (default: 10, max: 100)
+    """
+    if page < 1:
+        raise HTTPException(status_code=400, detail="Page must be >= 1")
+    
+    if limit < 1 or limit > 100:
+        raise HTTPException(status_code=400, detail="Limit must be between 1 and 100")
+    
+    # Get total count
+    total_count = db.query(CustomerUser).count()
+    
+    # Calculate total pages
+    total_pages = (total_count + limit - 1) // limit
+    
+    # Calculate offset
+    offset = (page - 1) * limit
+    
+    # Fetch paginated results
+    customers = db.query(CustomerUser).offset(offset).limit(limit).all()
+    
+    # Convert to dict
+    customers_data = [customer.to_dict() for customer in customers]
+    
+    return PaginatedCustomerResponse(
+        total=total_count,
+        page=page,
+        limit=limit,
+        total_pages=total_pages,
+        data=customers_data
+    )
 
 
 @router.post("/check-phone")
