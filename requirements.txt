@@ -8,3 +8,4 @@ pillow
 pydantic[email]
 firebase-admin
 PyJWT
+razorpay

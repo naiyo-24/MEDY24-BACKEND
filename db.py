@@ -62,6 +62,7 @@ def init_db():
     from models.lab_test.core_test_models import CoreLabTest
     from models.lab_test.lab_test_inventory_models import TestInventory
     from models.lab_test.test_package_models import TestPackage
+    from models.lab_test.test_package_booking_models import TestPackageBooking
     from models.about_us.about_us_models import AboutUs
     from models.medicine.core_medicine_models import CoreMedicine
     from models.terms_conditions.terms_conditions_models import TermsConditions

@@ -7,6 +7,7 @@ from routes.auth.pharma_shop_user_routes import router as pharma_shop_router
 from routes.lab_test.core_test_routes import router as core_test_router
 from routes.lab_test.lab_test_inventory_routes import router as lab_test_inventory_router
 from routes.lab_test.test_packaage_routes import router as test_package_router
+from routes.lab_test.test_package_booking_routes import router as test_package_booking_router
 from routes.about_us.about_us_routes import router as about_us_router
 from routes.medicine.core_medicine_routes import router as medicine_router
 from routes.terms_conditions.terms_conditions_routes import router as terms_conditions_router
@@ -107,6 +108,7 @@ app.include_router(customer_router)
 app.include_router(core_test_router)
 app.include_router(lab_test_inventory_router)
 app.include_router(test_package_router)
+app.include_router(test_package_booking_router)
 app.include_router(about_us_router)
 app.include_router(medicine_router)
 app.include_router(terms_conditions_router)
